@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spring Bloom Partnership Agreement</title>
+  <meta name="description" content="A tiny contract for a dreamy almond blossom date." />
+  <style>
+    :root{
+      --bg1:#fbf7f4;
+      --paper:#fffdfb;
+      --ink:#1f1f1f;
+      --muted:#6f6a66;
+      --accent:#c04b7a;
+      --accent2:#ffb4c8;
+      --line:rgba(0,0,0,.10);
+      --shadow:0 18px 60px rgba(0,0,0,.10);
+      --radius:22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --serif: ui-serif, Georgia, "Times New Roman", Times, serif;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--ink);
+      background:
+        radial-gradient(900px 600px at 12% 6%, rgba(192,75,122,.10), transparent 70%),
+        radial-gradient(900px 600px at 88% 8%, rgba(255,180,200,.22), transparent 60%),
+        radial-gradient(900px 700px at 50% 100%, rgba(255,215,225,.26), transparent 55%),
+        var(--bg1);
+      min-height:100vh;
+      padding:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow-x:hidden;
+    }
+
+    /* Blossom layer */
+    .blossoms{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      overflow:hidden;
+    }
+    .petal{
+      position:absolute;
+      top:-8vh;
+      width:14px;
+      height:10px;
+      background:linear-gradient(180deg, rgba(255,180,200,.95), rgba(255,255,255,.65));
+      border-radius: 12px 12px 12px 2px;
+      transform: rotate(12deg);
+      filter: blur(.1px);
+      opacity:.9;
+      animation: fall linear infinite;
+    }
+    .petal:after{
+      content:"";
+      position:absolute;
+      inset:1px 2px 3px 2px;
+      border-radius:inherit;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), rgba(255,255,255,0) 60%);
+      opacity:.7;
+    }
+    @keyframes fall{
+      0%{ transform: translateY(0) translateX(0) rotate(10deg); }
+      100%{ transform: translateY(120vh) translateX(16vw) rotate(240deg); }
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      z-index:1;
+      display:grid;
+      gap:14px;
+    }
+
+    .topnote{
+      text-align:center;
+      font-size:13px;
+      color:var(--muted);
+      letter-spacing:.2px;
+    }
+
+    .card{
+      background:rgba(255,253,251,.92);
+      backdrop-filter: blur(10px);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .header{
+      padding:26px 26px 16px;
+      border-bottom:1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(192,75,122,.08), transparent 70%);
+      position:relative;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px dashed rgba(192,75,122,.45);
+      background:rgba(192,75,122,.07);
+      color:var(--accent);
+      font-weight:650;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.9px;
+    }
+
+    h1{
+      margin:14px 0 8px;
+      font-family:var(--serif);
+      font-weight:750;
+      font-size:clamp(26px, 3.2vw, 40px);
+      line-height:1.12;
+      letter-spacing:-.4px;
+    }
+
+    .sub{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:15px;
+      max-width:80ch;
+    }
+
+    .grid{
+      padding:18px 26px 8px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+
+    .meta{
+      display:grid;
+      gap:10px;
+    }
+    .meta .row{
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(0,0,0,.02);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .meta .k{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .meta .v{
+      text-align:right;
+      font-size:13px;
+      color:var(--ink);
+      font-weight:650;
+      max-width:60%;
+    }
+
+    .countdown{
+      border:1px solid rgba(192,75,122,.20);
+      background:rgba(192,75,122,.06);
+      border-radius:18px;
+      padding:14px 14px;
+    }
+    .countdown .title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color:var(--accent);
+      font-weight:750;
+      letter-spacing:.2px;
+      margin-bottom:10px;
+    }
+    .chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .chip{
+      border:1px solid rgba(0,0,0,.10);
+      background:rgba(255,255,255,.75);
+      border-radius:999px;
+      padding:8px 10px;
+      min-width:92px;
+      text-align:center;
+    }
+    .chip .n{
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:850;
+      color:var(--ink);
+      line-height:1.1;
+    }
+    .chip .l{
+      font-family:var(--mono);
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .clauses{
+      padding:0;
+      margin:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+    .clause{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:white;
+      padding:14px 14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .num{
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:rgba(192,75,122,.10);
+      color:var(--accent);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .clause p{
+      margin:0;
+      line-height:1.55;
+    }
+    .clause b{ color:var(--ink); }
+
+    .fineprint{
+      padding:12px 26px 18px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      border-top:1px solid var(--line);
+    }
+
+    .sigWrap{
+      padding:18px 26px 22px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+
+    .sigBox{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(0,0,0,.02);
+      padding:14px;
+    }
+    .sigLabel{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.9px;
+      color:var(--muted);
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .sigLabel .date{
+      font-family:var(--mono);
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid rgba(0,0,0,.10);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      white-space:nowrap;
+    }
+
+    .nameRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    input[type="text"]{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.14);
+      background:white;
+      font-size:14px;
+      outline:none;
+    }
+    input[type="text"]:focus{
+      border-color: rgba(192,75,122,.55);
+      box-shadow: 0 0 0 4px rgba(192,75,122,.12);
+    }
+
+    .canvasWrap{
+      position:relative;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.14);
+      background:white;
+      overflow:hidden;
+    }
+    canvas{
+      width:100%;
+      height:160px;
+      display:block;
+      touch-action:none;
+      cursor:crosshair;
+    }
+    .canvasHint{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      pointer-events:none;
+      color:rgba(0,0,0,.35);
+      font-family:var(--mono);
+      font-size:12px;
+    }
+
+    .sigActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .btnRow{
+      padding:0 26px 26px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-start;
+    }
+
+    button, a.btn{
+      appearance:none;
+      border:1px solid rgba(0,0,0,.12);
+      background:white;
+      color:var(--ink);
+      padding:12px 14px;
+      border-radius:999px;
+      font-weight:750;
+      font-size:14px;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      transition: transform .07s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+    button:hover, a.btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.10);
+      border-color: rgba(0,0,0,.20);
+    }
+    .primary{
+      background:var(--accent);
+      color:white;
+      border-color:transparent;
+    }
+    .ghost{
+      background:rgba(255,255,255,.7);
+    }
+    .pill{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.14);
+    }
+
+    .status{
+      padding:0 26px 22px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    /* Celebration */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:rgba(31,31,31,.92);
+      color:white;
+      padding:12px 14px;
+      border-radius:999px;
+      font-size:13px;
+      box-shadow:0 18px 60px rgba(0,0,0,.22);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index:5;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-6px);
+    }
+
+    @media (max-width: 860px){
+      .grid{ grid-template-columns:1fr; }
+      .sigWrap{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blossoms" id="blossoms"></div>
+
+  <div class="wrap">
+    <div class="topnote">🌸 A tiny contract. A big mood. 🌸</div>
+
+    <section class="card">
+      <div class="header">
+        <div class="badge">Official Agreement • Almond Blossom Edition</div>
+        <h1>Spring Bloom Partnership Agreement</h1>
+        <p class="sub">
+          This agreement is made between <b>Shivangi</b> (the Planner) and <b>Amar</b> (the Very Lucky Husband)
+          for the purpose of witnessing almond blossoms at <b>Rodin Farms, Modesto, CA</b> on
+          <b>Friday, February 20, 2026</b>.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div>
+          <ul class="clauses">
+            <li class="clause">
+              <div class="num">1</div>
+              <p><b>You agree to wake up early</b> (yes, even if the bed is warm and life is unfair).</p>
+            </li>
+            <li class="clause">
+              <div class="num">2</div>
+              <p><b>You agree to hold my hand</b> in almond fields like a main character.</p>
+            </li>
+            <li class="clause">
+              <div class="num">3</div>
+              <p><b>You agree to take 47 photos of me</b> (minimum). Retakes are encouraged.</p>
+            </li>
+            <li class="clause">
+              <div class="num">4</div>
+              <p><b>Coffee is mandatory</b>. Complaints are not legally recognized.</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="meta">
+          <div class="row">
+            <div class="k">📍 Location</div>
+            <div class="v">Rodin Farms, Modesto, CA</div>
+          </div>
+          <div class="row">
+            <div class="k">🌅 Best light</div>
+            <div class="v">Sunrise / Golden Hour</div>
+          </div>
+          <div class="row">
+            <div class="k">🧾 Status</div>
+            <div class="v">Pending Amar’s signature</div>
+          </div>
+
+          <div class="countdown">
+            <div class="title">
+              <span>⏳ Countdown to Friday, Feb 20</span>
+              <span class="pill" id="tzpill">PT</span>
+            </div>
+            <div class="chips" id="chips">
+              <div class="chip"><div class="n" id="d">—</div><div class="l">days</div></div>
+              <div class="chip"><div class="n" id="h">—</div><div class="l">hours</div></div>
+              <div class="chip"><div class="n" id="m">—</div><div class="l">mins</div></div>
+              <div class="chip"><div class="n" id="s">—</div><div class="l">secs</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fineprint">
+        Additional terms: We will take a slow walk, breathe in “spring is coming” energy, and pretend we are not thinking about inboxes.
+        This agreement becomes effective upon both signatures below. 🌸
+      </div>
+
+      <div class="sigWrap">
+        <!-- Shivangi -->
+        <div class="sigBox">
+          <div class="sigLabel">
+            <span>Planner Signature — Shivangi</span>
+            <span class="date">Effective: Fri, Feb 20, 2026</span>
+          </div>
+
+          <div class="nameRow">
+            <input id="name1" type="text" placeholder="Type your full name (optional)" value="Shivangi Mishra" />
+          </div>
+
+          <div class="canvasWrap">
+            <canvas id="sig1"></canvas>
+            <div class="canvasHint" id="hint1">Draw your signature here ✍️</div>
+          </div>
+
+          <div class="sigActions">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="ghost" onclick="clearSig(1)">Clear</button>
+              <button class="ghost" onclick="saveSig(1)">Lock Signature</button>
+            </div>
+            <span style="font-family:var(--mono); font-size:12px; color:var(--muted);" id="lock1">Unlocked</span>
+          </div>
+        </div>
+
+        <!-- Amar -->
+        <div class="sigBox">
+          <div class="sigLabel">
+            <span>Very Lucky Husband Signature — Amar</span>
+            <span class="date">Effective: Fri, Feb 20, 2026</span>
+          </div>
+
+          <div class="nameRow">
+            <input id="name2" type="text" placeholder="Type your full name to accept (recommended)" />
+          </div>
+
+          <div class="canvasWrap">
+            <canvas id="sig2"></canvas>
+            <div class="canvasHint" id="hint2">Amar signs here to accept ✨</div>
+          </div>
+
+          <div class="sigActions">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="ghost" onclick="clearSig(2)">Clear</button>
+              <button class="ghost" onclick="saveSig(2)">Lock Signature</button>
+            </div>
+            <span style="font-family:var(--mono); font-size:12px; color:var(--muted);" id="lock2">Unlocked</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <a class="btn primary" target="_blank" rel="noreferrer"
+           href="https://www.google.com/maps/search/?api=1&query=Rodin%20Farms%20Modesto%20CA">
+          🗺️ Open Directions <span class="pill">Rodin Farms</span>
+        </a>
+
+        <button onclick="copyInvite()">📩 Copy Invite Text</button>
+        <button class="ghost" onclick="finalize()">✨ Finalize Agreement</button>
+      </div>
+
+      <div class="status" id="status">
+        Tip: Turn this page into a QR code, tape it to his coffee mug, and watch him “accidentally” sign it.
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">✨ Agreement accepted. Almond blossoms loading… 🌸</div>
+
+  <script>
+    // ===== Blossom generator =====
+    (function makeBlossoms(){
+      const container = document.getElementById("blossoms");
+      const petalCount = 26;
+      for(let i=0;i<petalCount;i++){
+        const p = document.createElement("div");
+        p.className = "petal";
+        const left = Math.random()*100;
+        const delay = Math.random()*8;
+        const dur = 7 + Math.random()*7;
+        const size = 10 + Math.random()*10;
+        p.style.left = left + "vw";
+        p.style.animationDelay = (-delay) + "s";
+        p.style.animationDuration = dur + "s";
+        p.style.width = size + "px";
+        p.style.height = (size*0.7) + "px";
+        p.style.opacity = (0.55 + Math.random()*0.4).toFixed(2);
+        p.style.transform = "rotate(" + (Math.random()*40 - 10) + "deg)";
+        container.appendChild(p);
+      }
+    })();
+
+    // ===== Countdown (Friday, Feb 20, 2026 PT) =====
+    const target = new Date("2026-02-20T07:00:00-08:00"); // ~sunrise-ish PT
+    function tick(){
+      const now = new Date();
+      const diff = Math.max(0, target - now);
+      const d = Math.floor(diff / (1000*60*60*24));
+      const h = Math.floor((diff / (1000*60*60)) % 24);
+      const m = Math.floor((diff / (1000*60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      document.getElementById("d").textContent = d;
+      document.getElementById("h").textContent = String(h).padStart(2,"0");
+      document.getElementById("m").textContent = String(m).padStart(2,"0");
+      document.getElementById("s").textContent = String(s).padStart(2,"0");
+    }
+    tick(); setInterval(tick, 1000);
+
+    // ===== Signature canvases =====
+    const sigState = {
+      1:{ locked:false, hasInk:false },
+      2:{ locked:false, hasInk:false }
+    };
+
+    function setupCanvas(id){
+      const canvas = document.getElementById("sig"+id);
+      const hint = document.getElementById("hint"+id);
+
+      // Fit canvas to device pixel ratio for crisp drawing
+      function resize(){
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        const ctx = canvas.getContext("2d");
+        ctx.scale(dpr, dpr);
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(0,0,0,.78)";
+      }
+      // initial
+      resize();
+      window.addEventListener("resize", resize);
+
+      const ctx = canvas.getContext("2d");
+      let drawing = false;
+      let last = null;
+
+      function pos(e){
+        const r = canvas.getBoundingClientRect();
+        const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+        return { x: clientX - r.left, y: clientY - r.top };
+      }
+
+      function start(e){
+        if(sigState[id].locked) return;
+        drawing = true;
+        last = pos(e);
+        hint.style.display = "none";
+        sigState[id].hasInk = true;
+      }
+      function move(e){
+        if(!drawing || sigState[id].locked) return;
+        const p = pos(e);
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        last = p;
+        e.preventDefault();
+      }
+      function end(){
+        drawing = false;
+        last = null;
+      }
+
+      canvas.addEventListener("mousedown", start);
+      canvas.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", end);
+
+      canvas.addEventListener("touchstart", start, {passive:false});
+      canvas.addEventListener("touchmove", move, {passive:false});
+      window.addEventListener("touchend", end);
+
+      return { canvas, ctx, hint, resize };
+    }
+
+    const c1 = setupCanvas(1);
+    const c2 = setupCanvas(2);
+
+    function clearSig(id){
+      if(sigState[id].locked) return toast("Signature is locked 🔒");
+      const c = id===1?c1:c2;
+      c.ctx.clearRect(0,0,c.canvas.width,c.canvas.height);
+      sigState[id].hasInk = false;
+      document.getElementById("hint"+id).style.display = "grid";
+      toast("Cleared ✨");
+    }
+
+    function saveSig(id){
+      if(!sigState[id].hasInk && !(document.getElementById("name"+id).value || "").trim()){
+        return toast("Add a name or a signature first 🙂");
+      }
+      sigState[id].locked = true;
+      document.getElementById("lock"+id).textContent = "Locked 🔒";
+      toast("Signature locked ✅");
+      // subtle flourish if Amar locks
+      if(id===2){
+        celebrate();
+        document.getElementById("status").textContent =
+          "Accepted ✨ Now the only remaining task is: show up, hold hands, and take 47 photos (minimum).";
+      }
+    }
+
+    // ===== Finalize agreement =====
+    function finalize(){
+      const n1 = (document.getElementById("name1").value || "").trim();
+      const n2 = (document.getElementById("name2").value || "").trim();
+
+      if(!sigState[2].hasInk && !n2){
+        return toast("Amar needs to sign (or type his name) to accept 😌");
+      }
+      if(!sigState[1].hasInk && !n1){
+        return toast("Planner signature missing — Shivangi please sign ✍️");
+      }
+
+      celebrate();
+      toast("✨ Agreement finalized. Almond blossoms loading… 🌸", 2200);
+      document.getElementById("status").textContent =
+        "Done ✅ Screenshot this for evidence. (Also: sunrise coffee is mandatory.)";
+    }
+
+    // ===== Copy invite =====
+    function copyInvite(){
+      const link = location.href.startsWith("http") ? location.href :
+        "https://(your-hosted-link-here)"; // replace after hosting
+      const msg =
+`🌸 Spring Bloom Partnership Agreement 🌸
+
+Hello Amar,
+Please review and sign your contract for Friday, Feb 20.
+Clause 3 (47 photos) is non-negotiable.
+
+Open the agreement: ${link}
+
+Directions: https://www.google.com/maps/search/?api=1&query=Rodin%20Farms%20Modesto%20CA
+
+— Shivangi`;
+      navigator.clipboard.writeText(msg).then(()=>{
+        toast("Invite copied ✅ Send it like it’s business-critical.");
+      }).catch(()=>{
+        toast("Copy failed—long press and copy from your notes 🙂");
+      });
+    }
+
+    // ===== Toast + Celebration =====
+    function toast(text, ms=1400){
+      const t = document.getElementById("toast");
+      t.textContent = text;
+      t.classList.add("show");
+      setTimeout(()=>t.classList.remove("show"), ms);
+    }
+
+    function celebrate(){
+      // quick confetti without libraries
+      const colors = ["#c04b7a","#ffb4c8","#ffd7e1","#1f1f1f"];
+      const count = 90;
+      for(let i=0;i<count;i++){
+        const s = document.createElement("span");
+        s.style.position="fixed";
+        s.style.left=(Math.random()*100)+"vw";
+        s.style.top="-12px";
+        s.style.width="8px";
+        s.style.height="8px";
+        s.style.borderRadius="2px";
+        s.style.background=colors[Math.floor(Math.random()*colors.length)];
+        s.style.opacity="0.95";
+        s.style.zIndex="6";
+        s.style.transform="rotate("+(Math.random()*360)+"deg)";
+        document.body.appendChild(s);
+
+        const anim = s.animate([
+          { transform: s.style.transform + " translateY(0)", opacity: 1 },
+          { transform: s.style.transform + " translateY(110vh)", opacity: 0.08 }
+        ], {
+          duration: 1200 + Math.random()*900,
+          easing: "cubic-bezier(.2,.7,.2,1)"
+        });
+        anim.onfinish = ()=>s.remove();
+      }
+    }
+
+    // tiny quality: show local timezone label
+    (function tz(){
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      document.getElementById("tzpill").textContent = tz.includes("Los_Angeles") ? "PT" : "Local";
+    })();
+  </script>
+</body>
+</html>
