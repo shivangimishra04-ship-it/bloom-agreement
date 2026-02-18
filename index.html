@@ -707,6 +707,17 @@
         return toast("Add a name or a signature first 🙂");
       }
       sigState[id].locked = true;
+            // Disable typing once locked
+      document.getElementById("name"+id).disabled = true;
+
+      // Disable buttons in that signature box once locked (Clear + Lock)
+      const box = document.getElementById("name"+id).closest(".sigBox");
+      if (box) {
+        const clearBtn = box.querySelector('button[onclick^="clearSig"]');
+        const lockBtn  = box.querySelector('button[onclick^="saveSig"]');
+        if (clearBtn) clearBtn.disabled = true;
+        if (lockBtn)  lockBtn.disabled  = true;
+      }
       document.getElementById("lock"+id).textContent = "Locked 🔒";
       toast("Signature locked ✅");
       // subtle flourish if Amar locks
@@ -718,13 +729,56 @@
     }
 
     // ===== Finalize agreement =====
-    function finalize(){
-      const n1 = (document.getElementById("name1").value || "").trim();
-      const n2 = (document.getElementById("name2").value || "").trim();
+    let finalized = false;
 
-      if(!sigState[2].hasInk && !n2){
-        return toast("Amar needs to sign (or type his name) to accept 😌");
-      }
+function setFinalizedUI(){
+  ["name1","name2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+
+  document.querySelectorAll('button[onclick^="clearSig"], button[onclick^="saveSig"]').forEach(b => b.disabled = true);
+
+  const finalizeBtn = document.querySelector('button[onclick="finalize()"]');
+  if (finalizeBtn) {
+    finalizeBtn.disabled = true;
+    finalizeBtn.textContent = "✅ Agreement Finalized";
+  }
+
+  document.getElementById("status").textContent =
+    "Finalized ✅ No further edits allowed.";
+}
+
+function finalize(){
+  const n1 = (document.getElementById("name1").value || "").trim();
+  const n2 = (document.getElementById("name2").value || "").trim();
+
+  if (finalized) return toast("Already finalized ✅");
+
+  if(!sigState[1].hasInk && !n1)
+    return toast("Planner signature missing – Shivangi please sign ✍️");
+
+  if(!sigState[2].hasInk && !n2)
+    return toast("Amar needs to sign (or type his name) to accept ✨");
+
+  if(!sigState[1].locked) saveSig(1);
+  if(!sigState[2].locked) saveSig(2);
+
+  finalized = true;
+  localStorage.setItem("bloom_finalized", "true");
+
+  celebrate();
+  toast("✨ Agreement finalized. Almond blossoms loading… 🌸", 2200);
+
+  setFinalizedUI();
+}
+
+(function(){
+  if(localStorage.getItem("bloom_finalized") === "true"){
+    finalized = true;
+    setFinalizedUI();
+  }
+})();
       if(!sigState[1].hasInk && !n1){
         return toast("Planner signature missing — Shivangi please sign ✍️");
       }
